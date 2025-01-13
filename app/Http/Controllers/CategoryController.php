@@ -26,10 +26,14 @@ class CategoryController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
         ]);
-
-        Category::create($request->only('name'));
-
-        return redirect()->route('categories.index');
+    
+        $category = new Category();
+        $category->name = $request->name;
+        $category->save();
+    
+        return response()->json([
+            'message' => 'Kategori berhasil ditambahkan!',
+        ], 201);
     }
 
     // Menampilkan form untuk mengedit kategori buku
