@@ -33,9 +33,9 @@
                             <h3 class="card-title">Form Tambah Buku</h3>
                         </div>
                         <div class="card-body">
-                            <form action="{{ route('books.store') }}" method="POST" enctype="multipart/form-data">
+                            <!-- Form Tambah Buku -->
+                            <form id="addBookForm" enctype="multipart/form-data">
                                 @csrf
-
                                 <!-- Judul Buku -->
                                 <div class="form-group">
                                     <label for="title">Judul Buku</label>
@@ -71,6 +71,9 @@
                                         <i class="fa fa-save"></i> Simpan
                                     </button>
                                 </div>
+
+                                <!-- Feedback -->
+                                <div id="responseMessage" class="mt-3"></div>
                             </form>
                         </div>
                     </div>
@@ -78,5 +81,43 @@
             </div>
         </div>
     </div>
+
+    <script>
+        $(document).ready(function () {
+            // Handle form submission using AJAX
+            $('#addBookForm').on('submit', function (e) {
+                e.preventDefault(); // Prevent default form submission
+
+                let formData = new FormData(this); // Create FormData for file upload
+
+                // AJAX request
+                $.ajax({
+                    url: "{{ route('books.store') }}", // Route to store book
+                    type: "POST",
+                    data: formData,
+                    processData: false, // Prevent jQuery from auto-processing data
+                    contentType: false, // Prevent jQuery from overriding Content-Type
+                    success: function (response) {
+                        $('#responseMessage').html(
+                            `<div class="alert alert-success">${response.message}</div>`
+                        );
+                        $('#addBookForm')[0].reset(); // Reset form fields
+                    },
+                    error: function (xhr) {
+                        let errors = xhr.responseJSON.errors;
+                        let errorMessages = '';
+
+                        for (let field in errors) {
+                            errorMessages += `<p>${errors[field][0]}</p>`;
+                        }
+
+                        $('#responseMessage').html(
+                            `<div class="alert alert-danger">${errorMessages}</div>`
+                        );
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>
